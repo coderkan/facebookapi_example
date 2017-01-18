@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FacebookExample.iml" filepath="$PROJECT_DIR$/FacebookExample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/facebookapi_example.iml" filepath="$PROJECT_DIR$/facebookapi_example.iml" />
     </modules>
   </component>
 </project>
