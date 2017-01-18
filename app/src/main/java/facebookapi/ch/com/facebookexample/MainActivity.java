@@ -19,6 +19,9 @@ import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
@@ -30,6 +33,8 @@ import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +52,7 @@ public class MainActivity extends FragmentActivity {
     private final String PENDING_ACTION_BUNDLE_KEY =
             "com.example.hellofacebook:PendingAction";
 
+    private Button getFeedButton;
     private Button postStatusUpdateButton;
     private Button postPhotoButton;
     private ProfilePictureView profilePictureView;
@@ -103,7 +109,6 @@ public class MainActivity extends FragmentActivity {
         FacebookSdk.sdkInitialize(this.getApplicationContext());
 
         callbackManager = CallbackManager.Factory.create();
-
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -161,6 +166,104 @@ public class MainActivity extends FragmentActivity {
                 handlePendingAction();
             }
         };
+
+
+
+
+
+        getFeedButton = (Button) findViewById(R.id.get_feed_button);
+        getFeedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                hasPublishPermission();
+                AccessToken accessToken = AccessToken.getCurrentAccessToken();
+
+                String token = "EAACEdEose0cBADzK3UKfap3zUlS0wBrplfMFSmvyOWJCbtD9NNJfUFpUsIv3F4Mxqdqy4LPHZA9EhCu8ZBOetgs1EMjdR1Es53LUUMO7G2XhsZBuZBZBLnvDMlaaMZCLNcMSLwMXILhYcBeMfofrN00AIHC7xghfmRLKtyCEZAleQZDZD";
+                String userid ="10153345617764536";
+                AccessToken at         = new AccessToken(token, getString(R.string.app_id), userid, null, null, null, null, null);
+//
+//                Bundle      parameters = new Bundle();
+//                parameters.putString("fields", "message,created_time,link,full_picture");
+//                new GraphRequest(at, "/" + at.getUserId() + "/feed", parameters, HttpMethod.GET, new GraphRequest.Callback() {
+//
+//                    public void onCompleted(GraphResponse response) {
+//
+//                        Log.i(this.getClass().getName(), "onCompleted " + response.getRawResponse());
+//                    }
+//                }).executeAsync();
+
+
+                if(accessToken == null)
+                    Log.e("TAG", "Access Token is null");
+
+                GraphRequest request = GraphRequest.newMeRequest(
+                        at,
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                // Insert your code here
+                                System.err.println("response>>" + response.toString());
+                            }
+                        });
+
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name");
+                request.setParameters(parameters);
+                request.executeAsync();
+//                AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//                GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+//
+//                    @Override
+//                    public void onCompleted(JSONObject object, GraphResponse response) {
+//                        // Application code
+//                        System.err.println("object>>" + object);
+//                        System.err.println("response>>" + response.toString());
+//                    }
+//                });
+//
+//                request.executeAsync();
+
+
+//
+//                new GraphRequest(
+//                        AccessToken.getCurrentAccessToken(),
+//                        "me?fields=albums.limit(5),posts.limit(5)",
+//                        //"/me/feed",
+//                        null,
+//                        HttpMethod.GET,
+//                        new GraphRequest.Callback() {
+//                            public void onCompleted(GraphResponse response) {
+//                            /* handle the result */
+//                                Log.e("TAG","onCompleted: ");
+//                                if(response != null ){
+//                                    Log.e("TAG","Response: " + response.toString());
+//                                }
+//                            }
+//                        }
+//                ).executeAsync();
+
+//                GraphRequest request = GraphRequest.newMeRequest(
+//                        AccessToken.getCurrentAccessToken(),
+//                        new GraphRequest.GraphJSONObjectCallback() {
+//                            @Override
+//                            public void onCompleted(
+//                                    JSONObject object,
+//                                    GraphResponse response) {
+//                                // Application code
+//                                if(object != null)
+//                                    Log.e("TAG","Object : "+ object.toString());
+//                                if(response != null)
+//                                    Log.e("TAG","Response : "+ response.toString());
+//                            }
+//                        });
+//                Bundle parameters = new Bundle();
+//                parameters.putString("fields", "id,name,link");
+//                request.setParameters(parameters);
+//                request.executeAsync();
+            }
+        });
+
 
         profilePictureView = (ProfilePictureView) findViewById(R.id.profilePicture);
         greeting = (TextView) findViewById(R.id.greeting);
@@ -295,8 +398,15 @@ public class MainActivity extends FragmentActivity {
 
     private boolean hasPublishPermission() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if(accessToken != null)
+            Log.e("TAG","accessToken is not null: " + accessToken.getPermissions().contains("publish_actions") );
         return accessToken != null && accessToken.getPermissions().contains("publish_actions");
     }
+    private void hasPublishPermissions() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        Log.e("TAG", "USER POSTS: " +  accessToken.getPermissions().contains("user_posts"));
+    }
+
 
     private void performPublish(PendingAction action, boolean allowNoToken) {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
